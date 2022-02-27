@@ -81,7 +81,7 @@ def get_valid_data(filename):
         txt = file.read().split("\n")
         # Correctness check of strings in "wronglastoctet.txt" file.
         if len(txt) != 2:
-            raise IncorectDataError
+            raise IncorrectDataError
             return None
         # Correctness check of strings in "wronglastoctet.txt" file again.
         try:
@@ -89,7 +89,7 @@ def get_valid_data(filename):
             ip_address = txt[1]
             octets = list(map(int, txt[1].split(".")))
         except Exception as ex:
-            raise IncorectDataError
+            raise IncorrectDataError
             return None
         # Correctness check for octets in ip address
         for octet in octets:

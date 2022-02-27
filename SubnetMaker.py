@@ -3,7 +3,7 @@ import random
 import ipaddress
 
 
-class IncorectDataError(Exception):
+class IncorrectDataError(Exception):
     def __init__(self):
         self.txt = "Error!\n" \
                    "In file 'wronglastoctet.txt' must be 2 strings:\n" \

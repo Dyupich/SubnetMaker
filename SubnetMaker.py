@@ -2,11 +2,13 @@
 import random
 import ipaddress
 
-def incorrect_data_error():
-    raise Exception("Error!\n"
-                    "In file 'in.txt' must be 2 strings:\n"
-                    "1: N - number of generated subnets;\n"
-                    "2: Ip address - example: 192.168.1.0")
+
+class IncorectDataError(Exception):
+    def __init__(self):
+        self.txt = "Error!\n" \
+                   "In file 'wronglastoctet.txt' must be 2 strings:\n" \
+                   "1: N - number of generated subnets;\n" \
+                   "2: Ip address - example: 192.168.1.0"
 
 
 def make_valid_subnet(prefix: int):
@@ -18,7 +20,6 @@ def make_valid_subnet(prefix: int):
         # Making offsets that will help us to make a validate address
         offset_octets = offset // 8
         offset_octet = 2 ** (offset % 8)
-        # min value of the network address is always 0.0.0.0
         subnet = []
         # At this moment we have 5 cases
         # Case 1: offset by octets == 0
@@ -72,22 +73,23 @@ def make_valid_subnet(prefix: int):
     raise TypeError("Prefix must be integer number")
     return None
 
+
 # O(1)
 def get_valid_data(filename):
-    with open("in.txt", "r") as file:
+    with open(filename, "r") as file:
         # Getting two strings from file
         txt = file.read().split("\n")
-        # Correctness check of strings in "in.txt" file.
+        # Correctness check of strings in "wronglastoctet.txt" file.
         if len(txt) != 2:
-            incorrect_data_error()
+            raise IncorectDataError
             return None
-        # Correctness check of strings in "in.txt" file again.
+        # Correctness check of strings in "wronglastoctet.txt" file again.
         try:
             N = int(txt[0])
             ip_address = txt[1]
             octets = list(map(int, txt[1].split(".")))
         except Exception as ex:
-            incorrect_data_error()
+            raise IncorectDataError
             return None
         # Correctness check for octets in ip address
         for octet in octets:
@@ -96,16 +98,18 @@ def get_valid_data(filename):
                 return None
         return N, ip_address
 
+
 # O(N)
-def get_min_subnet(ip_address: str):
-    if isinstance(ip_address, str):
-        with open("autogen.txt", "r") as file:
+def get_min_subnet(ip_address: str, iter_file: str):
+    if isinstance(ip_address, str) and isinstance(iter_file, str):
+        with open(iter_file, "r") as file:
             subnets = file.read().split('\n')
             max = ipaddress.IPv4Network('0.0.0.0/0')
             max_prefix = 0
             ip = ipaddress.IPv4Address(ip_address)
             for subnet in subnets:
-                # __contains__() method in subnets performs bitwise multiplication of ip and mask
+                # __contains__() method in subnets (instance of IPv4Network)
+                # performs bitwise multiplication of ip and mask
                 net = ipaddress.IPv4Network(subnet)
                 prefix = int(subnet.split('/')[1])
                 if ip in net:
@@ -113,17 +117,18 @@ def get_min_subnet(ip_address: str):
                         max = net
                         max_prefix = prefix
             return str(max)
-    raise TypeError("Ip address must be instance of 'str'")
+    raise TypeError("Arguments must be 'str' instance.")
     return None
+
 
 if __name__ == '__main__':
     # Reading file and if it has not validate data then raising a Exception
     N, ip_address = get_valid_data("in.txt")
     with open("autogen.txt", "w") as file:
-        for i in range(0, N-1):
+        for i in range(0, N - 1):
             # prefix of valid subnet must be in [/0, /32]
             file.write(f"{make_valid_subnet(random.randint(0, 32))}\n")
         file.write(f"{make_valid_subnet(random.randint(0, 32))}")
     with open("out.txt", "w") as file:
         file.write(f"{ip_address}\n")
-        file.write(get_min_subnet(ip_address))
+        file.write(get_min_subnet(ip_address, 'autogen.txt'))

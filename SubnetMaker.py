@@ -4,11 +4,7 @@ import ipaddress
 
 
 class IncorrectDataError(Exception):
-    def __init__(self):
-        self.txt = "Error!\n" \
-                   "In file 'wronglastoctet.txt' must be 2 strings:\n" \
-                   "1: N - number of generated subnets;\n" \
-                   "2: Ip address - example: 192.168.1.0"
+    pass
 
 
 def make_valid_subnet(prefix: int):
@@ -76,20 +72,24 @@ def make_valid_subnet(prefix: int):
 
 # O(1)
 def get_valid_data(filename):
+    exception_txt = "Error!\n" \
+          f"In file {filename} must be 2 strings:\n" \
+          "1: N - number of generated subnets;\n" \
+          "2: Ip address - example: 192.168.1.0"
     with open(filename, "r") as file:
         # Getting two strings from file
         txt = file.read().split("\n")
-        # Correctness check of strings in "wronglastoctet.txt" file.
+        # Correctness check of strings in "filename" file.
         if len(txt) != 2:
-            raise IncorrectDataError
+            raise IncorrectDataError(exception_txt)
             return None
-        # Correctness check of strings in "wronglastoctet.txt" file again.
+        # Correctness check of strings in "filename" file again.
         try:
             N = int(txt[0])
             ip_address = txt[1]
             octets = list(map(int, txt[1].split(".")))
         except Exception as ex:
-            raise IncorrectDataError
+            raise IncorrectDataError(exception_txt)
             return None
         # Correctness check for octets in ip address
         for octet in octets:
